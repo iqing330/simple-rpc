@@ -2,7 +2,7 @@
  * Alipay.com Inc.
  * Copyright (c) 2004-2020 All Rights Reserved.
  */
-package com.iqing.simple.rpc.server.model;
+package com.iqing.simple.rpc.client.model;
 
 /**
  * @author wangyuxiang

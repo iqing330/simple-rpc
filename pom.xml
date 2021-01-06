@@ -12,8 +12,6 @@
         <module>server</module>
         <module>configuration</module>
         <module>client</module>
-        <module>configuration-server</module>
-        <module>configutation-model</module>
     </modules>
 
     <dependencyManagement>
