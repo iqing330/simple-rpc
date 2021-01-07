@@ -25,7 +25,7 @@ public class BasicController {
 
     @GetMapping("/basic")
     public BasicResponse<Student> getStudentById(@RequestParam Long id) {
-        return BasicResponse.success(studentService.getStudentById(id));
+        return new BasicResponse().success(studentService.getStudentById(id));
 
     }
 }

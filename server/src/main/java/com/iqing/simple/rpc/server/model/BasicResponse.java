@@ -4,11 +4,15 @@
  */
 package com.iqing.simple.rpc.server.model;
 
+import java.io.Serializable;
+
 /**
  * @author wangyuxiang
  * @version 基础数据模型: BasicResponse.java, v 0.1 2020年12月28日 10:42 下午 wangyuxiang Exp $
  */
-public class BasicResponse<T> {
+public class BasicResponse<T> implements Serializable {
+
+    private static final long serialVersionUID = 6839723338337377090L;
 
     private Boolean success;
 
