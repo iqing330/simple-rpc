@@ -12,6 +12,7 @@
         <module>server</module>
         <module>configuration</module>
         <module>client</module>
+        <module>netty</module>
     </modules>
 
     <dependencyManagement>
