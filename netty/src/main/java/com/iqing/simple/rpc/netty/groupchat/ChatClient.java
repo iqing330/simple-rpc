@@ -29,12 +29,15 @@ public class ChatClient {
 
     private static final int PORT = 9999;
 
+    private static String selfName;
+
     public ChatClient() {
         try {
             selector = Selector.open();
             socketChannel = SocketChannel.open();
             Socket socket = socketChannel.socket();
             socket.connect(new InetSocketAddress(IP, PORT));
+            selfName = socketChannel.getLocalAddress().toString();
             socketChannel.configureBlocking(false);
             socketChannel.register(selector, SelectionKey.OP_READ);
         } catch (IOException e) {
@@ -43,11 +46,9 @@ public class ChatClient {
     }
 
     public void sendMsg(String msg) {
-
         ByteBuffer byteBuffer = ByteBuffer.wrap(msg.getBytes());
         try {
             socketChannel.write(byteBuffer);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,9 +75,10 @@ public class ChatClient {
                         int read = channel.read(byteBuffer);
 
                         if (read > 0) {
-                            System.out.println("收到数据");
+                            System.out.println(new String(byteBuffer.array()));
                         }
                     }
+                    iterator.remove();
                 }
             }
         } catch (Exception e) {
@@ -87,20 +89,16 @@ public class ChatClient {
     public static void main(String[] args) {
         ChatClient chatClient = new ChatClient();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
                 while (true) {
                     chatClient.receiveMsg();
                 }
-            }
         }).start();
 
         Scanner sc = new Scanner(System.in);
-
         while (sc.hasNextLine()) {
             String msg = sc.nextLine();
-            chatClient.sendMsg(msg);
+            chatClient.sendMsg(selfName + "说：" +msg);
         }
     }
 }

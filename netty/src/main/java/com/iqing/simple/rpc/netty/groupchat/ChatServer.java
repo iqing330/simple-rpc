@@ -7,12 +7,12 @@ package com.iqing.simple.rpc.netty.groupchat;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -79,14 +79,16 @@ public class ChatServer {
 
                                 int read = channel.read(byteBuffer);
 
-                                if(read > 0) {
+                                if (read > 0) {
                                     String msg = new String(byteBuffer.array());
 
                                     //往其他客户端转发消息
-                                    SocketChannel finalChannel = channel;
+                                    sendMsg(msg, channel);
+                                    /*SocketChannel finalChannel = channel;
                                     selectionKeys.stream()
                                             .map(SelectionKey::channel)
                                             .filter(selectableChannel -> finalChannel != selectableChannel)
+                                            .filter(selectableChannel -> selectableChannel instanceof SocketChannel)
                                             .map(selectableChannel -> (SocketChannel)selectableChannel)
                                             .filter(Objects::nonNull)
                                             .forEach(
@@ -94,26 +96,42 @@ public class ChatServer {
                                                         ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
                                                         try {
                                                             socketChannel.write(buffer);
+                                                            System.out.println("消息发送成功");
                                                         } catch (IOException e) {
                                                             e.printStackTrace();
                                                         }
                                                     }
-                                            );
+                                            );*/
                                 }
-                            }catch (IOException e) {
+                            } catch (IOException e) {
                                 System.out.println(channel.getRemoteAddress() + "下线了");
-
                             }
 
                         }
-
+                        iterator.remove();
                     }
-
                 } else {
-                    System.out.println("等待客户端连接。。。");
+
                 }
             } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+        }
+    }
+
+    public void sendMsg(String msg, SocketChannel self) {
+        Set<SelectionKey> selectionKeys = selector.keys();
+        System.out.println(selectionKeys.size());
+        for (SelectionKey selectionKey : selectionKeys) {
+            Channel channel = selectionKey.channel();
+            if (channel instanceof SocketChannel && channel != self) {
+                SocketChannel socketChannel = (SocketChannel) channel;
+                try {
+                    socketChannel.write(ByteBuffer.wrap(msg.getBytes()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -121,7 +139,6 @@ public class ChatServer {
 
     public static void main(String[] args) {
         ChatServer chatServer = new ChatServer();
-
         chatServer.listen();
     }
 }
